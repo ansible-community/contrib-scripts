@@ -1,4 +1,5 @@
 # Contributed Scripts for Ansible
+[![Python linting badge](https://github.com/ansible-community/contrib-scripts/workflows/Python%20linting/badge.svg?event=push&branch=main)](https://github.com/ansible-community/contrib-scripts/actions?query=workflow%3A%22Python+linting%22+branch%3Amain)
 
 This repository contains inventory and vault scripts contributed to Ansible.
 
