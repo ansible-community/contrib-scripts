@@ -1,0 +1,42 @@
+name: Python linting
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Run once per week (Monday at 06:00 UTC)
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 2.7
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install flake8 pylint
+
+      - name: Lint with flake8
+        run: |
+          flake8 inventory/ vault/ --ignore=E402,E501,E741,F401,F811,F841,W504
+
+      - name: Lint with pylint
+        run: |
+          pylint inventory/ vault/
