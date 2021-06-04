@@ -146,12 +146,22 @@ class RudderInventory(object):
         cache.write(json_data)
         cache.close()
 
-    def get_inherited_properties(self, node_id):
-        ''' Gets the node properties and inherited properties from Rudder api'''
+    def is_endpoint_defined(self, endpoint_name):
+        ''' Return True if endpoint is defined '''
 
+        defined = False
+        path = '/info'
+        result = self.api_call(path)
+        if 'endpoints' in result['data']:
+            defined = any(endpoint_name in x for x in result['data']['endpoints'])
+        return defined
+
+    def get_inherited_properties(self, node_id):
+        ''' Gets the node properties and inherited properties from Rudder api '''
+
+        properties = []
         path = '/nodes/' + node_id + '/inheritedProperties'
         result = self.api_call(path)
-        properties = []
         if 'properties' in result['data'][0]:
             # only keep the keys and values
             for prop in result['data'][0]['properties']:
@@ -166,10 +176,18 @@ class RudderInventory(object):
 
         nodes = {}
 
+        inherited_endpoint = self.is_endpoint_defined('nodeInheritedProperties')
+
         for node in result['data']['nodes']:
             nodes[node['id']] = {}
             nodes[node['id']]['hostname'] = node['hostname']
-            nodes[node['id']]['properties'] = self.get_inherited_properties(node['id'])
+            if inherited_endpoint:
+                nodes[node['id']]['properties'] = self.get_inherited_properties(node['id'])
+            else:
+                if 'properties' in node:
+                    nodes[node['id']]['properties'] = node['properties']
+                else:
+                    nodes[node['id']]['properties'] = []
 
         return nodes
 
@@ -257,7 +275,7 @@ class RudderInventory(object):
 
         try:
             response, content = self.conn.request(target.geturl(), method, body, headers)
-        except Exception:
+        except Exception as e:
             self.fail_with_error('Error connecting to Rudder server')
 
         try:
