@@ -142,9 +142,8 @@ class RudderInventory(object):
         ''' Writes data in JSON format to a file '''
 
         json_data = self.json_format_dict(self.inventory, True)
-        cache = open(self.cache_path, 'w')
-        cache.write(json_data)
-        cache.close()
+        with open(self.cache_path, 'w') as cache:
+            cache.write(json_data)
 
     def is_endpoint_defined(self, endpoint_name):
         ''' Return True if endpoint is defined '''
@@ -179,15 +178,13 @@ class RudderInventory(object):
         inherited_endpoint = self.is_endpoint_defined('nodeInheritedProperties')
 
         for node in result['data']['nodes']:
-            nodes[node['id']] = {}
-            nodes[node['id']]['hostname'] = node['hostname']
+            nodes[node['id']] = {'hostname': node['hostname']}
             if inherited_endpoint:
                 nodes[node['id']]['properties'] = self.get_inherited_properties(node['id'])
+            elif 'properties' in node:
+                nodes[node['id']]['properties'] = node['properties']
             else:
-                if 'properties' in node:
-                    nodes[node['id']]['properties'] = node['properties']
-                else:
-                    nodes[node['id']]['properties'] = []
+                nodes[node['id']]['properties'] = []
 
         return nodes
 
@@ -197,12 +194,13 @@ class RudderInventory(object):
         path = '/groups'
         result = self.api_call(path)
 
-        groups = {}
-
-        for group in result['data']['groups']:
-            groups[group['id']] = {'hosts': group['nodeIds'], 'name': self.to_safe(group[self.group_name])}
-
-        return groups
+        return {
+            group['id']: {
+                'hosts': group['nodeIds'],
+                'name': self.to_safe(group[self.group_name]),
+            }
+            for group in result['data']['groups']
+        }
 
     def update_cache(self):
         ''' Fetches the inventory information from Rudder and creates the inventory '''
@@ -214,14 +212,14 @@ class RudderInventory(object):
 
         for group in groups:
             # Check for name collision
-            if self.fail_if_name_collision:
-                if groups[group]['name'] in inventory:
-                    self.fail_with_error('Name collision on groups: "%s" appears twice' % groups[group]['name'], 'creating groups')
+            if self.fail_if_name_collision and groups[group]['name'] in inventory:
+                self.fail_with_error('Name collision on groups: "%s" appears twice' % groups[group]['name'], 'creating groups')
             # Add group to inventory
-            inventory[groups[group]['name']] = {}
-            inventory[groups[group]['name']]['hosts'] = []
-            inventory[groups[group]['name']]['vars'] = {}
-            inventory[groups[group]['name']]['vars']['rudder_group_id'] = group
+            inventory[groups[group]['name']] = {
+                'hosts': [],
+                'vars': {'rudder_group_id': group},
+            }
+
             for node in groups[group]['hosts']:
                 # Add node to group
                 inventory[groups[group]['name']]['hosts'].append(nodes[node]['hostname'])
@@ -230,12 +228,13 @@ class RudderInventory(object):
 
         for node in nodes:
             # Check for name collision
-            if self.fail_if_name_collision:
-                if nodes[node]['hostname'] in properties:
-                    self.fail_with_error('Name collision on hosts: "%s" appears twice' % nodes[node]['hostname'], 'creating hosts')
+            if (
+                self.fail_if_name_collision
+                and nodes[node]['hostname'] in properties
+            ):
+                self.fail_with_error('Name collision on hosts: "%s" appears twice' % nodes[node]['hostname'], 'creating hosts')
             # Add node properties to inventory
-            properties[nodes[node]['hostname']] = {}
-            properties[nodes[node]['hostname']]['rudder_node_id'] = node
+            properties[nodes[node]['hostname']] = {'rudder_node_id': node}
             for node_property in nodes[node]['properties']:
                 properties[nodes[node]['hostname']][self.to_safe(node_property['name'])] = node_property['value']
 
