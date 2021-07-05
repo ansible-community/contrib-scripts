@@ -1,0 +1,53 @@
+name: Integration tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Run once per week (Monday at 06:00 UTC)
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  integration:
+    name: Python ${{ matrix.python-version }}, Ⓐ${{ matrix.ansible }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 2.7
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
+        ansible:
+          - stable-2.9
+          - stable-2.10
+          - stable-2.11
+          - devel
+        exclude:
+          - ansible: stable-2.9
+            python-version: 3.9
+          - ansible: devel
+            python-version: 2.7
+          - ansible: devel
+            python-version: 3.6
+          - ansible: devel
+            python-version: 3.7
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install the head of the given branch (devel, stable-2.10)
+      - name: Install ansible-core (${{ matrix.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
+
+      - name: Run foreman inventory script tests
+        run: ./runme.sh
+        working-directory: ./tests/inventory/foreman/
