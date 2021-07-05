@@ -21,7 +21,7 @@ use_reports_api = False
 FOREMAN_INI
 
 # use ansible to validate the return data
-ansible-playbook -i foreman.sh test_foreman_inventory.yml --connection=local
+ansible-playbook -i ../../../inventory/foreman.py test_foreman_inventory.yml --connection=local
 RC=$?
 if [[ $RC != 0 ]]; then
     echo "foreman inventory script smoketest failed"
@@ -42,7 +42,7 @@ group_prefix = Ľuboš_
 FOREMAN_INI
 
 # use ansible to validate the return data
-ansible-playbook -i foreman.sh test_foreman_inventory.yml --connection=local
+ansible-playbook -i ../../../inventory/foreman.py test_foreman_inventory.yml --connection=local
 RC=$?
 if [[ $RC != 0 ]]; then
     echo "foreman inventory script non-ascii failed"
