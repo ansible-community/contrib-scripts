@@ -35,7 +35,7 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 inventory/ vault/ --ignore=E402,E501,E741,F401,F811,F812,F841,W504
+          flake8 inventory/ vault/
 
       - name: Lint with pylint
         run: |
