@@ -4,6 +4,7 @@ disable=
     abstract-method,
     access-member-before-definition,
     arguments-differ,
+    arguments-renamed,
     assignment-from-no-return,
     assignment-from-none,
     attribute-defined-outside-init,
@@ -17,6 +18,7 @@ disable=
     comparison-with-callable,
     consider-iterating-dictionary,
     consider-merging-isinstance,
+    consider-using-dict-items,
     consider-using-dict-comprehension,  # requires Python 2.7+, but we still require Python 2.6 support
     consider-using-enumerate,
     consider-using-get,
