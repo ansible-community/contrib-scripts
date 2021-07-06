@@ -228,10 +228,7 @@ class RudderInventory(object):
 
         for node in nodes:
             # Check for name collision
-            if (
-                self.fail_if_name_collision
-                and nodes[node]['hostname'] in properties
-            ):
+            if self.fail_if_name_collision and nodes[node]['hostname'] in properties:
                 self.fail_with_error('Name collision on hosts: "%s" appears twice' % nodes[node]['hostname'], 'creating hosts')
             # Add node properties to inventory
             properties[nodes[node]['hostname']] = {'rudder_node_id': node}
