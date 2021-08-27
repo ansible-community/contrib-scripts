@@ -140,6 +140,10 @@ This can also be set with the environmental variable CONSUL_UNAVAILABLE_SUFFIX.
 Note that if the inventory discovers an 'ssh' service running on a node it will
 register the port as ansible_ssh_port in the node's metadata and this port will
 be used to access the machine.
+
+'node_to_ip'
+
+if true then the node would be parsed as ip address. Else would keep using node name.
 ```
 
 '''
@@ -312,10 +316,11 @@ class ConsulInventory(object):
         '''loads the data for a single node adding it to various groups based on
         metadata retrieved from the kv store and service availability'''
 
-        if self.config.suffixes == 'true':
-            index, node_data = self.consul_api.catalog.node(node, dc=datacenter)
-        else:
+        if self.config.bulk_load == 'true':
             node_data = self.consul_get_node_inmemory(node)
+        else:
+            index, node_data = self.consul_api.catalog.node(node, dc=datacenter)
+
         node = node_data['Node']
 
         self.add_node_to_map(self.nodes, 'all', node)
@@ -326,8 +331,9 @@ class ConsulInventory(object):
         self.load_node_metadata_from_kv(node_data)
         if self.config.suffixes == 'true':
             self.load_availability_groups(node_data, datacenter)
-            for name, service in node_data['Services'].items():
-                self.load_data_from_service(name, service, node_data)
+
+        for name, service in node_data['Services'].items():
+            self.load_data_from_service(name, service, node_data)
 
     def load_node_metadata_from_kv(self, node_data):
         ''' load the json dict at the metadata path defined by the kv_metadata value
@@ -425,8 +431,10 @@ class ConsulInventory(object):
                 return '%s.node.%s.%s' % (node_name, self.current_dc, domain)
             else:
                 return '%s.node.%s' % (node_name, domain)
-        else:
+        elif self.config.node_to_ip == 'true':
             return node_data['Address']
+        else:
+            return node_data['Node']
 
     def add_node_to_map(self, map, name, node):
         self.push(map, name, self.get_inventory_name(node))
@@ -484,7 +492,7 @@ class ConsulConfig(dict):
         config_options = ['host', 'token', 'datacenter', 'servers_suffix',
                           'tags', 'kv_metadata', 'kv_groups', 'availability',
                           'unavailable_suffix', 'available_suffix', 'url',
-                          'domain', 'suffixes', 'bulk_load']
+                          'domain', 'suffixes', 'bulk_load', 'node_to_ip']
         for option in config_options:
             value = None
             if config.has_option('consul', option):
@@ -514,7 +522,7 @@ class ConsulConfig(dict):
         env_var_options = ['host', 'token', 'datacenter', 'servers_suffix',
                            'tags', 'kv_metadata', 'kv_groups', 'availability',
                            'unavailable_suffix', 'available_suffix', 'url',
-                           'domain', 'suffixes', 'bulk_load']
+                           'domain', 'suffixes', 'bulk_load', 'node_to_ip']
         for option in env_var_options:
             value = None
             env_var = 'CONSUL_' + option.upper()
