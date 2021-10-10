@@ -144,6 +144,7 @@ be used to access the machine.
 'node_to_ip'
 
 if true then the node would be parsed as ip address. Else would keep using node name.
+This can also be set with the env. variable CONSUL_NODE_TO_IP
 ```
 
 '''
