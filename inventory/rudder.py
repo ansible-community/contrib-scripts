@@ -43,11 +43,10 @@ import sys
 import os
 import re
 import argparse
-import httplib2 as http
 from time import time
 from ansible.module_utils import six
 from ansible.module_utils.six.moves import configparser
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from ansible.module_utils.urls import open_url
 
 import json
 
@@ -62,9 +61,6 @@ class RudderInventory(object):
         # Read settings and parse CLI arguments
         self.read_settings()
         self.parse_cli_args()
-
-        # Create connection
-        self.conn = http.Http(disable_ssl_certificate_validation=self.disable_ssl_validation)
 
         # Cache
         if self.args.refresh_cache:
@@ -97,7 +93,7 @@ class RudderInventory(object):
         self.version = os.environ.get('RUDDER_API_VERSION', config.get('rudder', 'version'))
         self.uri = os.environ.get('RUDDER_API_URI', config.get('rudder', 'uri'))
 
-        self.disable_ssl_validation = config.getboolean('rudder', 'disable_ssl_certificate_validation')
+        self.disable_ssl_validation = not config.getboolean('rudder', 'disable_ssl_certificate_validation')
         self.group_name = config.get('rudder', 'group_name')
         self.fail_if_name_collision = config.getboolean('rudder', 'fail_if_name_collision')
 
@@ -265,21 +261,23 @@ class RudderInventory(object):
             'Content-Type': 'application/json;charset=utf-8'
         }
 
-        target = urlparse(self.uri + path)
+        request_path = self.uri + path
+
+
         method = 'GET'
         body = ''
 
         try:
-            response, content = self.conn.request(target.geturl(), method, body, headers)
+            request = open_url(request_path, headers=headers, validate_certs=self.disable_ssl_validation)
         except Exception as e:
             self.fail_with_error('Error connecting to Rudder server')
 
         try:
-            data = json.loads(content)
+            response = json.load(request)
         except ValueError as e:
             self.fail_with_error('Could not parse JSON response from Rudder API', 'reading API response')
 
-        return data
+        return response
 
     def fail_with_error(self, err_msg, err_operation=None):
         ''' Logs an error to std err for ansible-playbook to consume and exit '''
