@@ -27,7 +27,11 @@ import re
 from time import time
 
 from ansible.module_utils.six import iteritems, string_types
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import libcloud.security as sec
@@ -84,7 +88,7 @@ class LibcloudInventory(object):
     def read_settings(self):
         ''' Reads the settings from the libcloud.ini file '''
 
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         libcloud_default_ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'libcloud.ini')
         libcloud_ini_path = os.environ.get('LIBCLOUD_INI_PATH', libcloud_default_ini_path)
         config.read(libcloud_ini_path)

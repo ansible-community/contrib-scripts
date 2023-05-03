@@ -39,7 +39,11 @@ import time
 
 import json
 
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 from ansible.module_utils.urls import open_url
 
 
@@ -202,7 +206,7 @@ if __name__ == '__main__':
     enterprise = {}
 
     # Read config
-    config = ConfigParser.SafeConfigParser()
+    config = ConfigParser()
     for configfilename in [os.path.abspath(sys.argv[0]).rstrip('.py') + '.ini', 'abiquo.ini']:
         if os.path.exists(configfilename):
             config.read(configfilename)

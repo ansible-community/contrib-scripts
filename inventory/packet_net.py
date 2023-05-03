@@ -36,6 +36,11 @@ from time import time
 
 from ansible.module_utils import six
 from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 try:
     import packet
@@ -103,10 +108,7 @@ class PacketInventory(object):
 
     def read_settings(self):
         ''' Reads the settings from the packet_net.ini file '''
-        if six.PY3:
-            config = configparser.ConfigParser()
-        else:
-            config = configparser.SafeConfigParser()
+        config = ConfigParser()
 
         _ini_path_raw = os.environ.get('PACKET_NET_INI_PATH')
 

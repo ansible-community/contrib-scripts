@@ -24,7 +24,12 @@ import sys
 import StringIO
 
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+from ansible.module_utils.six.moves.configparser import configparser_
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 configparser = None
 
@@ -35,11 +40,11 @@ def get_from_rhc_config(variable):
     if os.path.exists(CONF_FILE):
         if not configparser:
             ini_str = '[root]\n' + open(CONF_FILE, 'r').read()
-            configparser = ConfigParser.SafeConfigParser()
+            configparser = ConfigParser()
             configparser.readfp(StringIO.StringIO(ini_str))
         try:
             return configparser.get('root', variable)
-        except ConfigParser.NoOptionError:
+        except configparser_.NoOptionError:
             return None
 
 

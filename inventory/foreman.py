@@ -30,7 +30,12 @@ if LooseVersion(requests.__version__) < LooseVersion('1.1.0'):
 from requests.auth import HTTPBasicAuth
 
 from ansible.module_utils._text import to_text
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 
 def json_format_dict(data, pretty=False):
@@ -63,7 +68,7 @@ class ForemanInventory(object):
     def read_settings(self):
         """Reads the settings from the foreman.ini file"""
 
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         config.read(self.config_paths)
 
         # Foreman API related
@@ -72,121 +77,121 @@ class ForemanInventory(object):
             self.foreman_user = config.get('foreman', 'user')
             self.foreman_pw = config.get('foreman', 'password', raw=True)
             self.foreman_ssl_verify = config.getboolean('foreman', 'ssl_verify')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError) as e:
+        except (configparser.NoOptionError, configparser.NoSectionError) as e:
             print("Error parsing configuration: %s" % e, file=sys.stderr)
             return False
 
         # Inventory Report Related
         try:
             self.foreman_use_reports_api = config.getboolean('foreman', 'use_reports_api')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.foreman_use_reports_api = True
 
         try:
             self.want_organization = config.getboolean('report', 'want_organization')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_organization = True
 
         try:
             self.want_location = config.getboolean('report', 'want_location')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_location = True
 
         try:
             self.want_IPv4 = config.getboolean('report', 'want_ipv4')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_IPv4 = True
 
         try:
             self.want_IPv6 = config.getboolean('report', 'want_ipv6')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_IPv6 = False
 
         try:
             self.want_host_group = config.getboolean('report', 'want_host_group')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_host_group = True
 
         try:
             self.want_host_params = config.getboolean('report', 'want_host_params')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_host_params = False
 
         try:
             self.want_subnet = config.getboolean('report', 'want_subnet')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_subnet = True
 
         try:
             self.want_subnet_v6 = config.getboolean('report', 'want_subnet_v6')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_subnet_v6 = False
 
         try:
             self.want_smart_proxies = config.getboolean('report', 'want_smart_proxies')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_smart_proxies = True
 
         try:
             self.want_content_facet_attributes = config.getboolean('report', 'want_content_facet_attributes')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_content_facet_attributes = False
 
         try:
             self.report_want_facts = config.getboolean('report', 'want_facts')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.report_want_facts = True
 
         try:
             self.poll_interval = config.getint('report', 'poll_interval')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.poll_interval = 10
 
         # Ansible related
         try:
             group_patterns = config.get('ansible', 'group_patterns')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             group_patterns = "[]"
 
         self.group_patterns = json.loads(group_patterns)
 
         try:
             self.group_prefix = config.get('ansible', 'group_prefix')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.group_prefix = "foreman_"
 
         try:
             self.want_facts = config.getboolean('ansible', 'want_facts')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_facts = True
 
         self.want_facts = self.want_facts and self.report_want_facts
 
         try:
             self.want_hostcollections = config.getboolean('ansible', 'want_hostcollections')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_hostcollections = False
 
         try:
             self.want_ansible_ssh_host = config.getboolean('ansible', 'want_ansible_ssh_host')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.want_ansible_ssh_host = False
 
         # Do we want parameters to be interpreted if possible as JSON? (no by default)
         try:
             self.rich_params = config.getboolean('ansible', 'rich_params')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.rich_params = False
 
         try:
             self.host_filters = config.get('foreman', 'host_filters')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.host_filters = None
 
         # Cache related
         try:
             cache_path = os.path.expanduser(config.get('cache', 'path'))
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             cache_path = '.'
         (script, ext) = os.path.splitext(os.path.basename(__file__))
         self.cache_path_cache = cache_path + "/%s.cache" % script
@@ -196,11 +201,11 @@ class ForemanInventory(object):
         self.cache_path_hostcollections = cache_path + "/%s.hostcollections" % script
         try:
             self.cache_max_age = config.getint('cache', 'max_age')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.cache_max_age = 60
         try:
             self.scan_new_hosts = config.getboolean('cache', 'scan_new_hosts')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             self.scan_new_hosts = False
 
         return True

@@ -60,7 +60,11 @@ except ImportError:  # Python 2
 import json
 
 from ansible.module_utils.six import iteritems
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 # NOTE -- this file assumes Ansible is being accessed FROM the cobbler
 # server, so it does not attempt to login with a username and password.
@@ -132,7 +136,7 @@ class CobblerInventory(object):
         if self.ignore_settings:
             return
 
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         config.read(os.path.dirname(os.path.realpath(__file__)) + '/cobbler.ini')
 
         self.cobbler_host = config.get('cobbler', 'host')

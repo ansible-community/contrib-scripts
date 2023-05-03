@@ -26,7 +26,11 @@ import re
 import argparse
 import sys
 
-from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 import json
 
 try:
@@ -38,7 +42,7 @@ except ImportError:
 class NagiosLivestatusInventory(object):
 
     def parse_ini_file(self):
-        config = configparser.SafeConfigParser()
+        config = ConfigParser()
         config.read(os.path.dirname(os.path.realpath(__file__)) + '/nagios_livestatus.ini')
         for section in config.sections():
             if not config.has_option(section, 'livestatus_uri'):

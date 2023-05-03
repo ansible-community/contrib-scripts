@@ -157,6 +157,11 @@ from boto import sts
 from ansible.module_utils import six
 from ansible_collections.amazon.aws.plugins.module_utils import ec2 as ec2_utils
 from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 HAS_BOTO3 = False
 try:
@@ -309,10 +314,7 @@ class Ec2Inventory(object):
             }
         }
 
-        if six.PY3:
-            config = configparser.ConfigParser(DEFAULTS)
-        else:
-            config = configparser.SafeConfigParser(DEFAULTS)
+        config = ConfigParser(DEFAULTS)
         ec2_ini_path = os.environ.get('EC2_INI_PATH', defaults['ec2']['ini_path'])
         ec2_ini_path = os.path.expanduser(os.path.expandvars(ec2_ini_path))
 

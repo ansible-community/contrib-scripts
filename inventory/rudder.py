@@ -46,7 +46,11 @@ import argparse
 import httplib2 as http
 from time import time
 from ansible.module_utils import six
-from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 
 import json
@@ -85,10 +89,7 @@ class RudderInventory(object):
 
     def read_settings(self):
         ''' Reads the settings from the rudder.ini file '''
-        if six.PY2:
-            config = configparser.SafeConfigParser()
-        else:
-            config = configparser.ConfigParser()
+        config = ConfigParser()
         rudder_default_ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rudder.ini')
         rudder_ini_path = os.path.expanduser(os.path.expandvars(os.environ.get('RUDDER_INI_PATH', rudder_default_ini_path)))
         config.read(rudder_ini_path)
