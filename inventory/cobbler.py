@@ -129,7 +129,7 @@ class CobblerInventory(object):
     def read_settings(self):
         """ Reads the settings from the cobbler.ini file """
 
-        if(self.ignore_settings):
+        if self.ignore_settings:
             return
 
         config = ConfigParser.SafeConfigParser()
@@ -166,7 +166,7 @@ class CobblerInventory(object):
 
         # Cache related
         cache_path = os.getenv('COBBLER_cache_path', None)
-        if(cache_path is not None):
+        if cache_path is not None:
             self.cache_path_cache = cache_path + "/ansible-cobbler.cache"
             self.cache_path_inventory = cache_path + "/ansible-cobbler.index"
 
@@ -174,7 +174,7 @@ class CobblerInventory(object):
 
         # ignore_settings is used to ignore the settings file, for use in Ansible
         # Tower (or AWX inventory scripts and not throw python exceptions.)
-        if(os.getenv('COBBLER_ignore_settings', False) == "True"):
+        if os.getenv('COBBLER_ignore_settings', False) == "True":
             self.ignore_settings = True
 
     def parse_cli_args(self):

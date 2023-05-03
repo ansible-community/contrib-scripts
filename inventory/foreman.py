@@ -390,7 +390,7 @@ class ForemanInventory(object):
             return
         host_data = json.loads(inventory_report_response)
         for host in host_data:
-            if not(host) or (host["name"] in self.cache.keys() and scan_only_new_hosts):
+            if not host or (host["name"] in self.cache.keys() and scan_only_new_hosts):
                 continue
             dns_name = host['name']
 

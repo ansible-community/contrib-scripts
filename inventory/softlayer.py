@@ -131,7 +131,7 @@ class SoftLayerInventory(object):
 
         dest = instance['primaryIpAddress']
 
-        instance['tags'] = list()
+        instance['tags'] = []
         for tag in instance['tagReferences']:
             instance['tags'].append(tag['tag']['name'])
 
