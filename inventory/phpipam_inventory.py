@@ -29,7 +29,7 @@ custom_field = "custom_managed"
 filter_value = "Yes"
 # Get the inventory file path from an environment variable, used when outputting inventory to
 # a static file.
-#inventory_file_path = os.environ.get('IPAMDEV_FILEPATH')
+# inventory_file_path = os.environ.get('IPAMDEV_FILEPATH')
 
 
 # ENV lookup for the query URL, for example
@@ -50,8 +50,8 @@ response = requests.get(url, headers=headers)
 print("*********************************************")
 # Uncomment the below two lines to help when troublshooting to dump the contents of the API call to the console.
 
-#response_dict = response.json()
-#print(json.dumps(response_dict, indent=4))
+# response_dict = response.json()
+# print(json.dumps(response_dict, indent=4))
 
 if response.status_code != 200:
     raise ValueError(f"Failed to retrieve addresses: {response.content}")
