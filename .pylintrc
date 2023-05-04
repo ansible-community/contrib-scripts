@@ -12,6 +12,7 @@ disable=
     bad-indentation,
     bad-mcs-classmethod-argument,
     broad-except,
+    broad-exception-raised,
     c-extension-no-member,
     cell-var-from-loop,
     chained-comparison,
@@ -21,6 +22,7 @@ disable=
     consider-using-dict-items,
     consider-using-dict-comprehension,  # requires Python 2.7+, but we still require Python 2.6 support
     consider-using-enumerate,
+    consider-using-f-string,  # requires Python 3.6+, but we still require Python 2.6 support
     consider-using-get,
     consider-using-in,
     consider-using-set-comprehension,  # requires Python 2.7+, but we still require Python 2.6 support
@@ -51,7 +53,6 @@ disable=
     literal-comparison,
     locally-disabled,
     method-hidden,
-    misplaced-comparison-constant,
     missing-docstring,
     no-else-break,
     no-else-continue,
@@ -66,7 +67,6 @@ disable=
     not-a-mapping,
     not-an-iterable,
     not-callable,
-    old-style-class,
     pointless-statement,
     pointless-string-statement,
     possibly-unused-variable,
@@ -75,7 +75,7 @@ disable=
     redefined-argument-from-local,
     redefined-builtin,
     redefined-outer-name,
-    redefined-variable-type,
+    redundant-u-string-prefix,  # we still support Python 2.x
     reimported,
     relative-beyond-top-level,  # https://github.com/PyCQA/pylint/issues/2967
     signature-differs,
@@ -106,7 +106,9 @@ disable=
     unexpected-keyword-arg,
     ungrouped-imports,
     unidiomatic-typecheck,
+    unknown-option-value,
     unnecessary-pass,
+    unspecified-encoding,
     unsubscriptable-object,
     unsupported-assignment-operation,
     unsupported-delete-operation,
@@ -115,8 +117,10 @@ disable=
     unused-import,
     unused-variable,
     useless-object-inheritance,
+    useless-option-value,
     useless-return,
     useless-super-delegation,
+    use-dict-literal,
     wrong-import-order,
     wrong-import-position,
 

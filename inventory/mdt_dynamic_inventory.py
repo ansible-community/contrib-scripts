@@ -17,7 +17,11 @@ maintainer: J Barnett (github @jbarnett1981)
 import argparse
 import json
 import pymssql
-from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 
 class MDTInventory(object):
@@ -89,7 +93,7 @@ class MDTInventory(object):
         '''
         Reads the settings from the mdt.ini file
         '''
-        config = configparser.SafeConfigParser()
+        config = ConfigParser()
         config.read('mdt.ini')
 
         # MDT Server and instance and database

@@ -67,7 +67,12 @@ import traceback
 import json
 
 from ansible.module_utils.six import iteritems
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 
 from ansible.module_utils.urls import open_url
@@ -220,7 +225,7 @@ class CollinsInventory(object):
 
         config_loc = os.getenv('COLLINS_CONFIG', os.path.dirname(os.path.realpath(__file__)) + '/collins.ini')
 
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         config.read(os.path.dirname(os.path.realpath(__file__)) + '/collins.ini')
 
         self.collins_host = config.get('collins', 'host')

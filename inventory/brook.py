@@ -69,7 +69,11 @@ Version: 0.2
 import sys
 import os
 
-from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 import json
 

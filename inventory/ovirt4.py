@@ -55,8 +55,11 @@ import sys
 
 from collections import defaultdict
 
-from ansible.module_utils.six.moves import configparser
 from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 import json
 
@@ -107,24 +110,14 @@ def create_connection():
     config_path = os.environ.get('OVIRT_INI_PATH', default_path)
 
     # Create parser and add ovirt section if it doesn't exist:
-    if PY2:
-        config = configparser.SafeConfigParser(
-            defaults={
-                'ovirt_url': os.environ.get('OVIRT_URL'),
-                'ovirt_username': os.environ.get('OVIRT_USERNAME'),
-                'ovirt_password': os.environ.get('OVIRT_PASSWORD'),
-                'ovirt_ca_file': os.environ.get('OVIRT_CAFILE', ''),
-            }, allow_no_value=True
-        )
-    else:
-        config = configparser.ConfigParser(
-            defaults={
-                'ovirt_url': os.environ.get('OVIRT_URL'),
-                'ovirt_username': os.environ.get('OVIRT_USERNAME'),
-                'ovirt_password': os.environ.get('OVIRT_PASSWORD'),
-                'ovirt_ca_file': os.environ.get('OVIRT_CAFILE', ''),
-            }, allow_no_value=True
-        )
+    config = ConfigParser(
+        defaults={
+            'ovirt_url': os.environ.get('OVIRT_URL'),
+            'ovirt_username': os.environ.get('OVIRT_USERNAME'),
+            'ovirt_password': os.environ.get('OVIRT_PASSWORD'),
+            'ovirt_ca_file': os.environ.get('OVIRT_CAFILE', ''),
+        }, allow_no_value=True
+    )
     if not config.has_section('ovirt'):
         config.add_section('ovirt')
     config.read(config_path)

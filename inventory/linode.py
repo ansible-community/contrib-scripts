@@ -98,7 +98,11 @@ except Exception:
 load_chube_config()
 
 # Imports for ansible
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 
 class LinodeInventory(object):
@@ -148,7 +152,7 @@ class LinodeInventory(object):
 
     def read_settings(self):
         """Reads the settings from the .ini file."""
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         config.read(os.path.dirname(os.path.realpath(__file__)) + '/linode.ini')
 
         # Cache related
