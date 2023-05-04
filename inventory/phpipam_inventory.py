@@ -74,7 +74,7 @@ for address in addresses:
     if custom_role is not None and custom_role.strip() != "":
        if custom_role not in custom_roles:
             custom_roles[custom_role] = {"hosts": {}}
-        custom_roles[custom_role]["hosts"][hostname] = {"ansible_host": ip_address}
+       custom_roles[custom_role]["hosts"][hostname] = {"ansible_host": ip_address}
 
     if custom_managed == "Yes":
         all_hosts[hostname] = {"ansible_host": ip_address}
