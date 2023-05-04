@@ -9,7 +9,12 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import argparse
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 import os
 import re
 from time import time
@@ -88,7 +93,7 @@ class CloudFormsInventory(object):
         """
         Reads the settings from the cloudforms.ini file
         """
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         config_paths = [
             os.path.dirname(os.path.realpath(__file__)) + '/cloudforms.ini',
             "/etc/ansible/cloudforms.ini",
@@ -174,7 +179,7 @@ class CloudFormsInventory(object):
         # Ansible related
         try:
             group_patterns = config.get('ansible', 'group_patterns')
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             group_patterns = "[]"
 
         self.group_patterns = eval(group_patterns)
@@ -182,7 +187,7 @@ class CloudFormsInventory(object):
         # Cache related
         try:
             cache_path = os.path.expanduser(config.get('cache', 'path'))
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             cache_path = '.'
         (script, ext) = os.path.splitext(os.path.basename(__file__))
         self.cache_path_hosts = cache_path + "/%s.hosts" % script

@@ -59,7 +59,11 @@ import sys
 import os
 import argparse
 from collections import defaultdict
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 import json
 
@@ -113,7 +117,7 @@ class OVirtInventory(object):
         # This provides empty defaults to each key, so that environment
         # variable configuration (as opposed to INI configuration) is able
         # to work.
-        config = ConfigParser.SafeConfigParser(defaults={
+        config = ConfigParser(defaults={
             'ovirt_url': '',
             'ovirt_username': '',
             'ovirt_password': '',

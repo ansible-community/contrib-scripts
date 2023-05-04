@@ -598,7 +598,7 @@ class DockerInventory(object):
             short_id = id[:13]
 
             try:
-                name = container.get('Names', list()).pop(0).lstrip('/')
+                name = container.get('Names', []).pop(0).lstrip('/')
             except IndexError:
                 name = short_id
 
@@ -669,7 +669,7 @@ class DockerInventory(object):
         :param config: dictionary read from config file. can be empty.
         :return: list of connection dictionaries
         '''
-        hosts = list()
+        hosts = []
 
         hosts_list = config.get('hosts')
         defaults = config.get('defaults', dict())

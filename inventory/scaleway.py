@@ -32,7 +32,11 @@ import copy
 import os
 import requests
 from ansible.module_utils import six
-from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 import sys
 import time
 import traceback
@@ -201,10 +205,7 @@ if __name__ == '__main__':
     inventory = {}
 
     # Read config
-    if six.PY3:
-        config = configparser.ConfigParser()
-    else:
-        config = configparser.SafeConfigParser()
+    config = ConfigParser()
     for configfilename in [os.path.abspath(sys.argv[0]).rsplit('.py')[0] + '.ini', 'scaleway.ini']:
         if os.path.exists(configfilename):
             config.read(configfilename)

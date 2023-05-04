@@ -102,9 +102,9 @@ def stack_net_list(endpoint, header, client):
 
 def format_meta(hostdata, intfdata, config):
     use_hostnames = config['use_hostnames']
-    meta = dict(all=dict(hosts=list()),
-                frontends=dict(hosts=list()),
-                backends=dict(hosts=list()),
+    meta = dict(all=dict(hosts=[]),
+                frontends=dict(hosts=[]),
+                backends=dict(hosts=[]),
                 _meta=dict(hostvars=dict()))
 
     # Iterate through list of dicts of hosts and remove
@@ -112,7 +112,7 @@ def format_meta(hostdata, intfdata, config):
     for host in hostdata:
         del host['environment']
         meta['_meta']['hostvars'][host['host']] = host
-        meta['_meta']['hostvars'][host['host']]['interfaces'] = list()
+        meta['_meta']['hostvars'][host['host']]['interfaces'] = []
 
     # @bbyhuy to improve readability in next iteration
 

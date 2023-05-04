@@ -60,7 +60,11 @@ except ImportError:  # Python 2
 import json
 
 from ansible.module_utils.six import iteritems
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 # NOTE -- this file assumes Ansible is being accessed FROM the cobbler
 # server, so it does not attempt to login with a username and password.
@@ -129,10 +133,10 @@ class CobblerInventory(object):
     def read_settings(self):
         """ Reads the settings from the cobbler.ini file """
 
-        if(self.ignore_settings):
+        if self.ignore_settings:
             return
 
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         config.read(os.path.dirname(os.path.realpath(__file__)) + '/cobbler.ini')
 
         self.cobbler_host = config.get('cobbler', 'host')
@@ -166,7 +170,7 @@ class CobblerInventory(object):
 
         # Cache related
         cache_path = os.getenv('COBBLER_cache_path', None)
-        if(cache_path is not None):
+        if cache_path is not None:
             self.cache_path_cache = cache_path + "/ansible-cobbler.cache"
             self.cache_path_inventory = cache_path + "/ansible-cobbler.index"
 
@@ -174,7 +178,7 @@ class CobblerInventory(object):
 
         # ignore_settings is used to ignore the settings file, for use in Ansible
         # Tower (or AWX inventory scripts and not throw python exceptions.)
-        if(os.getenv('COBBLER_ignore_settings', False) == "True"):
+        if os.getenv('COBBLER_ignore_settings', False) == "True":
             self.ignore_settings = True
 
     def parse_cli_args(self):

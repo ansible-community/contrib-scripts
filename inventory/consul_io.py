@@ -154,7 +154,11 @@ import re
 import argparse
 import sys
 
-from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 
 def get_log_filename():
@@ -484,7 +488,7 @@ class ConsulConfig(dict):
 
     def read_settings(self):
         ''' Reads the settings from the consul_io.ini file (or consul.ini for backwards compatibility)'''
-        config = configparser.SafeConfigParser()
+        config = ConfigParser()
         if os.path.isfile(os.path.dirname(os.path.realpath(__file__)) + '/consul_io.ini'):
             config.read(os.path.dirname(os.path.realpath(__file__)) + '/consul_io.ini')
         else:

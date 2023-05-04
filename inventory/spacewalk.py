@@ -39,7 +39,11 @@ import subprocess
 import json
 
 from ansible.module_utils.six import iteritems
-from ansible.module_utils.six.moves import configparser as ConfigParser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -110,7 +114,7 @@ parser.add_option('-p', default=False, dest="prefix_org_name", action="store_tru
 # read spacewalk.ini if present
 # ------------------------------
 if os.path.exists(INI_FILE):
-    config = ConfigParser.SafeConfigParser()
+    config = ConfigParser()
     config.read(INI_FILE)
     if config.has_option('spacewalk', 'cache_age'):
         CACHE_AGE = config.get('spacewalk', 'cache_age')

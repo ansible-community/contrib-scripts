@@ -20,7 +20,11 @@ import distutils.spawn
 import sys
 import json
 
-from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.six import PY2
+if PY2:
+    from ansible.module_utils.six.moves.configparser import SafeConfigParser as ConfigParser
+else:
+    from ansible.module_utils.six.moves.configparser import ConfigParser
 
 # Set up defaults
 resource = 'local:'
@@ -30,7 +34,7 @@ hosts = {}
 result = {}
 
 # Read the settings from the lxd.ini file
-config = configparser.SafeConfigParser()
+config = ConfigParser()
 config.read(os.path.dirname(os.path.realpath(__file__)) + '/lxd.ini')
 if config.has_option('lxd', 'resource'):
     resource = config.get('lxd', 'resource')
