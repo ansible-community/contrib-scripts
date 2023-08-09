@@ -59,28 +59,28 @@ def try_unlock_vault() -> None:
 
     if can_unlock:
         try:
-            subprocess.run(["rbw", "unlock"])
+            subprocess.run(["rbw", "unlock"], check=True)
             return
         except subprocess.CalledProcessError:
-            exit(1)
+            sys.exit(1)
 
-    exit(1)  # Locked, can't do anything about it, bye!
+    sys.exit(1)  # Locked, can't do anything about it, bye!
 
 
 def get_credentials(vault_id, credential, folder):
     try:
-        subprocess.run(["rbw", "unlocked"]).check_returncode()
+        subprocess.run(["rbw", "unlocked"], check=True)
     except subprocess.CalledProcessError:
         try_unlock_vault()
 
     try:
         folder_args = [] if not folder else ["--folder", folder]
         rbw = subprocess.run(
-            ["rbw", "get", *folder_args, credential.replace("{VAULT_ID}", vault_id)]
+            ["rbw", "get", *folder_args, credential.replace("{VAULT_ID}", vault_id)],
+            check=True,
         )
-        rbw.check_returncode()
     except subprocess.CalledProcessError:
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
