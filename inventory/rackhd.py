@@ -30,7 +30,7 @@ class RackhdInventory(object):
 
         results = {}
         for (key, url) in info.items():
-            r = requests.get(url, verify=False)
+            r = requests.get(url, verify=False, timeout=300)
             results[key] = r.text
         self._inventory[nodeid] = results
 
@@ -76,7 +76,7 @@ if (parse_args().host):
 if (parse_args().list):
     try:
         url = RACKHD_URL + '/api/common/nodes'
-        r = requests.get(url, verify=False)
+        r = requests.get(url, verify=False, timeout=300)
         data = json.loads(r.text)
         for entry in data:
             if entry['type'] == 'compute':
