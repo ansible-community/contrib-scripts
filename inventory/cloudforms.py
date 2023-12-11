@@ -229,7 +229,8 @@ class CloudFormsInventory(object):
 
         ret = requests.get(url,
                            auth=HTTPBasicAuth(self.cloudforms_username, self.cloudforms_pw),
-                           verify=self.cloudforms_ssl_verify)
+                           verify=self.cloudforms_ssl_verify,
+                           timeout=300)
 
         ret.raise_for_status()
 

@@ -46,7 +46,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
-response = requests.get(url, headers=headers)
+response = requests.get(url, headers=headers, timeout=300)
 print("*********************************************")
 # Uncomment the below two lines to help when troublshooting to dump the contents of the API call to the console.
 
