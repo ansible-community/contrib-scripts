@@ -1,1 +1,2 @@
 # Add package constraints here for CI (like for pylint and flake8).
+pylint < 3.2.1
